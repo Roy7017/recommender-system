@@ -1,5 +1,5 @@
 # Ignore the python environment, 
-./venv
+./venv/
 
 # Ignore the activation script I created
 activate.ps1
