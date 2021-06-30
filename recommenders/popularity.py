@@ -1,6 +1,4 @@
 from typing import Dict
-import numpy as np
-import pandas as pd
 from base import BaseModel
 
 class PopularityModel(BaseModel):

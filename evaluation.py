@@ -1,5 +1,4 @@
 from typing import Dict
-import numpy as np
 import pandas as pd
 
 def recall_at_N(rankings: Dict[str, list], test_count: pd.DataFrame, N: int = 20):
