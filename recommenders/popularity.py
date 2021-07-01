@@ -1,5 +1,5 @@
 from typing import Dict
-from base import BaseModel
+from recommenders.base import BaseModel
 
 class PopularityModel(BaseModel):
     def rank_items(self):

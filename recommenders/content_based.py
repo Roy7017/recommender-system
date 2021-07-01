@@ -5,7 +5,7 @@ import pandas as pd
 from typing import Dict
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
-from .base import BaseModel
+from recommenders.base import BaseModel
 
 class ContentBasedRecommender(BaseModel):
     def __init__(self, train_count: pd.DataFrame, test_count: pd.DataFrame):
