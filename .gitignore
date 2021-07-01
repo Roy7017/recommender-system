@@ -4,3 +4,6 @@ venv/
 # Ignore the activation script I created
 activate.ps1
 
+# Ignore cache files
+*__pycache__/
+
