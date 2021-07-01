@@ -1,44 +1,51 @@
 import recommenders
+from data.interaction_manager import InteractionManager
 
 class Controller():
     def __init__(self) -> None:
         pass
 
-    def register_click(impression_id):
+    def train_recommenders(self):
         pass
 
-    def get_recommendations(user_id):
+    def generate_recommendations(self):
         pass
 
-    def get_similar_items(item_id):
+    def register_click(self, impression_id):
         pass
 
-    def get_associated_items(item_id):
+    def get_recommendations(self, user_id):
         pass
 
-    def add_user(user):
+    def get_similar_items(self, item_id):
         pass
 
-    def modify_user(user_id, user):
+    def get_associated_items(self, item_id):
         pass
 
-    def delete_user(user_id):
-        pass
+    def add_user(self, user):
+        InteractionManager.add_user(user)
 
-    def add_service(service):
-        pass
+    def modify_user(self, user_id, user):
+        InteractionManager.modify_user(user_id, user)
 
-    def modify_service(service_id, service):
-        pass
+    def delete_user(self, user_id):
+        InteractionManager.delete_user(user_id)
 
-    def delete_service(service_id):
-        pass
+    def add_service(self, service):
+        InteractionManager.add_service(service)
 
-    def add_subscription(subscription):
-        pass
+    def modify_service(self, service_id, service):
+        InteractionManager.modify_service(service_id, service)
 
-    def modify_subscription(subscription_id, subscription):
-        pass
+    def delete_service(self, service_id):
+        InteractionManager.delete_service(service_id)
 
-    def delete_subscription(subscription_id):
-        pass
+    def add_subscription(self, subscription):
+        InteractionManager.add_subscription(subscription)
+
+    def modify_subscription(self, subscription_id, subscription):
+        InteractionManager.modify_subscription(subscription_id, subscription)
+
+    def delete_subscription(self, subscription_id):
+        InteractionManager.delete_subscription(subscription_id)
