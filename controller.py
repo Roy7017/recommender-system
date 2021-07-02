@@ -1,51 +1,69 @@
-import recommenders
+from recommendation_engine import RecommendationEngine
 from data.interaction_manager import InteractionManager
+from data.feedback_manager import FeedbackManager
+from data.history_manager import HistoryManager
 
 class Controller():
-    def __init__(self) -> None:
+    # def __init__(self) -> None:
+    #     pass
+
+    @classmethod
+    def train_recommenders(cls):
+        RecommendationEngine.train()
+
+    @classmethod
+    def generate_recommendations(cls):
+        RecommendationEngine.predict()
+
+    @classmethod
+    def register_click(cls, impression_id):
+        FeedbackManager.register_click(impression_id=impression_id)
+
+    @classmethod
+    def get_recommendations(cls, user_id, n=40):
+        recommendations = HistoryManager.get_recommendations(user_id)[:n]
+        return recommendations
+
+    @classmethod
+    def get_similar_items(cls, item_id):
         pass
 
-    def train_recommenders(self):
+    @classmethod
+    def get_associated_items(cls, item_id):
         pass
 
-    def generate_recommendations(self):
-        pass
-
-    def register_click(self, impression_id):
-        pass
-
-    def get_recommendations(self, user_id):
-        pass
-
-    def get_similar_items(self, item_id):
-        pass
-
-    def get_associated_items(self, item_id):
-        pass
-
-    def add_user(self, user):
+    @classmethod
+    def add_user(cls, user):
         InteractionManager.add_user(user)
 
-    def modify_user(self, user_id, user):
+    @classmethod
+    def modify_user(cls, user_id, user):
         InteractionManager.modify_user(user_id, user)
 
-    def delete_user(self, user_id):
+    @classmethod
+    def delete_user(cls, user_id):
         InteractionManager.delete_user(user_id)
 
-    def add_service(self, service):
+    @classmethod
+    def add_service(cls, service):
         InteractionManager.add_service(service)
 
-    def modify_service(self, service_id, service):
+    @classmethod
+    def modify_service(cls, service_id, service):
         InteractionManager.modify_service(service_id, service)
 
-    def delete_service(self, service_id):
+    @classmethod
+    def delete_service(cls, service_id):
         InteractionManager.delete_service(service_id)
 
-    def add_subscription(self, subscription):
+    @classmethod
+    def add_subscription(cls, subscription):
         InteractionManager.add_subscription(subscription)
 
-    def modify_subscription(self, subscription_id, subscription):
+    @classmethod
+    def modify_subscription(cls, subscription_id, subscription):
         InteractionManager.modify_subscription(subscription_id, subscription)
 
-    def delete_subscription(self, subscription_id):
+    @classmethod
+    def delete_subscription(cls, subscription_id):
         InteractionManager.delete_subscription(subscription_id)
