@@ -8,8 +8,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from recommenders.base import BaseModel
 
 class ContentBasedRecommender(BaseModel):
-    def __init__(self, train_count: pd.DataFrame, test_count: pd.DataFrame):
-        super().__init__(train_count, test_count)
+    def __init__(self):
+        super().__init__()
         nltk.download('stopwords')
 
         self.REPLACE_BY_SPACE_RE = re.compile('[/(){}\[\]\|@,;]')
