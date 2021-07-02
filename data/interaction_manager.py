@@ -1,6 +1,12 @@
 from models.interaction_models import User, Service, Subscription
 
 class InteractionManager():
+
+    @classmethod
+    def get_users(cls):
+        users = User.objects.all()
+        return [user.to_dict() for user in users]
+
     @classmethod
     def add_user(cls, user):
         new_user = User(
@@ -16,7 +22,7 @@ class InteractionManager():
 
     @classmethod
     def modify_user(cls, user_id, user):
-        new_user = User.objects.get(id=user_id)
+        new_user = User.objects(id=user_id).first()
         if user['username'] is not None: new_user.username=str(user['username'])
         if user['email'] is not None: new_user.email=str(user['email'])
         if user['lastname'] is not None: new_user.last_name=str(user['lastname'])
@@ -27,8 +33,13 @@ class InteractionManager():
 
     @classmethod
     def delete_user(cls, user_id):
-        user = User.objects.get(id=user_id)
+        user = User.objects(id=user_id).first()
         return user.delete()
+
+    @classmethod
+    def get_services(cls):
+        services = Service.objects.all()
+        return [service.to_dict() for service in services]
 
     @classmethod
     def add_service(cls, service):
@@ -45,7 +56,7 @@ class InteractionManager():
 
     @classmethod
     def modify_service(cls, service_id, service):
-        new_service = Service.objects.get(id=service_id)
+        new_service = Service.objects(id=service_id).first()
         if service['name'] is not None: new_service.name=str(service['name'])
         if service['task_name'] is not None: new_service.task_name=str(service['task_name'])
         if service['description'] is not None: new_service.description=str(service['description'])
@@ -55,8 +66,13 @@ class InteractionManager():
 
     @classmethod
     def delete_service(cls, service_id):
-        service = Service.objects.get(id=service_id)
+        service = Service.objects(id=service_id).first()
         return service.delete()
+
+    @classmethod
+    def get_subscriptions(cls):
+        subscriptions = Subscription.objects.all()
+        return [subscription.to_dict() for subscription in subscriptions]
 
     @classmethod
     def add_subscription(cls, subscription):
@@ -73,7 +89,7 @@ class InteractionManager():
 
     @classmethod
     def modify_subscription(cls, subscription_id, subscription):
-        new_subscription = Subscription.objects.get(id=subscription_id)
+        new_subscription = Subscription.objects(id=subscription_id).first()
         if subscription['name'] is not None: new_subscription.name = str(subscription['name'])
         if subscription['url'] is not None: new_subscription.url = str(subscription['url'])
         if subscription['expired_date'] is not None: new_subscription.expired_date = str(subscription['expired_date'])
@@ -85,5 +101,5 @@ class InteractionManager():
 
     @classmethod
     def delete_subscription(cls, subscription_id):
-        subscription = Subscription.objects.get(id=subscription_id)
+        subscription = Subscription.objects(id=subscription_id).first()
         return subscription.delete()
