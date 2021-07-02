@@ -1,3 +1,4 @@
+from typing import Dict
 from database import db
 
 class User(db.Document):
@@ -9,6 +10,17 @@ class User(db.Document):
     city = db.StringField()
     country = db.StringField()
 
+    def to_dict(self) -> Dict:
+        return {
+            'objectId': self.id,
+            'username': self.username,
+            'email': self.email,
+            'lastname': self.last_name,
+            'mobile': self.mobile,
+            'city': self.city,
+            'country': self.country
+        }
+
 class Service(db.Document):
     id = db.StringField(primary_key=True)
     name = db.StringField()
@@ -16,6 +28,16 @@ class Service(db.Document):
     description = db.StringField()
     haveAndroidApp = db.BooleanField()
     haveIOSApp = db.BooleanField()
+
+    def to_dict(self) -> Dict:
+        return {
+            'objectId': self.id,
+            'name': self.name,
+            'task_name': self.task_name,
+            'description': self.description,
+            'haveAndroidApp': self.haveAndroidApp,
+            'haveIOSApp': self.haveIOSApp
+        }
 
 class Subscription(db.Document):
     id = db.StringField(primary_key=True)
@@ -27,3 +49,14 @@ class Subscription(db.Document):
     user = db.LazyReferenceField(User)
 
     service = db.LazyReferenceField(Service)
+
+    def to_dict(self) -> Dict:
+        return {
+            'objectId': self.id,
+            'name': self.name,
+            'url': self.url,
+            'expired_date': self.expired_date,
+            'createdAt': self.subscription_date,
+            'user': self.user,
+            'service': self.service
+        }
