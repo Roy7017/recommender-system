@@ -9,8 +9,10 @@ from recommenders.popularity import PopularityModel
 from recommenders.knn import SurpriseKnnNormalModel
 from data.interaction_manager import InteractionManager
 from data.history_manager import HistoryManager
+from item_graph import ItemGraph
 
-class RecommendationEngine():
+
+class RecommendationEngine:
 
     # als_model: ImplicitAlternatingLeastSquares
     # content_based_model: ContentBasedRecommender
@@ -25,8 +27,9 @@ class RecommendationEngine():
         content_based_model: ContentBasedRecommender,
         popularity_model: PopularityModel,
         item_knn_model: SurpriseKnnNormalModel,
+        item_graph: ItemGraph,
         min_service_count: int = 15,
-        prediction_weights: Dict = {'als': 0.5, 'knn': 0.2, 'content': 0.2, 'popularity': 0.1},
+        prediction_weights: Dict = {"als": 0.5, "knn": 0.2, "content": 0.2, "popularity": 0.1},
     ) -> None:
         self.als_model = als_model
         self.content_based_model = content_based_model
@@ -56,16 +59,16 @@ class RecommendationEngine():
             how="left",
         )
 
-        self.users = self.train_data['user'].unique()
-        self.services = self.train_data['service'].unique()
-        
+        self.users = self.train_data["user"].unique()
+        self.services = self.train_data["service"].unique()
+
         start = time.time()
         self.als_model.fit(train_data=self.train_data)
         self.item_knn_model.fit(train_data=self.train_data)
-        self.content_based_model.fit(train_data=self.train_data, service_data=self.service_df, ngram_range=(1,3))
+        self.content_based_model.fit(train_data=self.train_data, service_data=self.service_df, ngram_range=(1, 3))
         end = time.time()
 
-        metrics = {} # TODO : Evaluate recommender metrics
+        metrics = {}  # TODO : Evaluate recommender metrics
 
         duration = end - start
         date = datetime.now()
@@ -76,31 +79,15 @@ class RecommendationEngine():
         global_rankings: Dict[str, List] = {}
 
         start = time.time()
-        als_rankings: Dict[str, List] = self.als_model.rank_items()
-        content_based_rankings = self.content_based_model.rank_items()
-        item_knn_rankings = self.item_knn_model.rank_items()
-        popularity_rankings = self.popularity_model.rank_items()
 
+        global_rankings = self.get_user_rankings()
+
+        # Filter out the services the user has already purchased.
         for user in self.users:
-            ranks: List[List] = []
-            # Check the number of services bought
-            # if the number of services bought is less than the minimum defined, we just use the popularity
-            # and go to the next user
-            if self.train_data[self.train_data['user'] == user]['service'].count() < self.min_service_count:
-                global_rankings[user] = popularity_rankings[user]
-                continue
-
-            for service in self.services:
-                als_rank = self.getIndex(als_rankings[user], service)
-                content_based_rank = self.getIndex(content_based_rankings[user], service)
-                item_knn_rank = self.getIndex(item_knn_rankings[user], service)
-                popularity_rank = self.getI
-
-                rank = als_rank*self.prediction_weights['als'] + content_based_rank*self.prediction_weights['content'] + item_knn_rank*self.prediction_weights['knn']
-                ranks.append([service, rank])
-
-            ranks = ranks.sort(key=lambda item: item[1], reverse=False)
-            global_rankings[user] = [rank[0] for rank in ranks]
+            user_services = self.train_data[self.train_data["user"] == user]["service"].values
+            for service in user_services:
+                if service in global_rankings[user]:
+                    global_rankings[user].remove(service)
 
         end = time.time()
         duration = end - start
@@ -112,12 +99,49 @@ class RecommendationEngine():
 
         return global_rankings
 
-    def getIndex(self, array:list, item):
+    def get_user_rankings(self):
+        global_rankings: Dict[str, List] = {}
+        als_rankings: Dict[str, List] = self.als_model.rank_items()
+        content_based_rankings = self.content_based_model.rank_items()
+        item_knn_rankings = self.item_knn_model.rank_items()
+        popularity_rankings = self.popularity_model.rank_items()
+
+        for user in self.users:
+            ranks: List[List] = []
+            # Check the number of services bought
+            # if the number of services bought is less than the minimum defined, we just use the popularity
+            # and go to the next user
+            user_services = self.train_data[self.train_data["user"] == user]["service"].values
+            if len(user_services) < self.min_service_count:
+                global_rankings[user] = popularity_rankings[user]
+                continue
+
+            for service in self.services:
+                als_rank = self.getIndex(als_rankings[user], service)
+                content_based_rank = self.getIndex(content_based_rankings[user], service)
+                item_knn_rank = self.getIndex(item_knn_rankings[user], service)
+                popularity_rank = self.getIndex(popularity_rankings[user], service)
+
+                rank = (
+                    als_rank * self.prediction_weights["als"]
+                    + content_based_rank * self.prediction_weights["content"]
+                    + item_knn_rank * self.prediction_weights["knn"]
+                    + popularity_rank * self.prediction_weights["popularity"]
+                )
+                ranks.append([service, rank])
+
+            ranks.sort(key=lambda item: item[1], reverse=False)
+            global_rankings[user] = [rank[0] for rank in ranks]
+
+        return global_rankings
+
+    def get_similar_items(self, item_id):
+        return self.als_model.similar_items(item_id)
+
+    def getIndex(self, array: list, item):
+        array = list(array)
         if item in array:
             return array.index(item)
         else:
             array.append(item)
             return array.index(item)
-        
-
-
