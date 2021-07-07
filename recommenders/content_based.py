@@ -17,6 +17,7 @@ class ContentBasedRecommender(BaseModel):
         self.STOPWORDS = set(stopwords.words('english'))
 
     def fit(self, train_data: pd.DataFrame, service_data: pd.DataFrame, ngram_range= (1,1)):
+        super().fit(train_data)
         self.train_data = train_data[train_data['description'].notna()]
         self.service_data = service_data[service_data['description'].notna()]
 
@@ -41,7 +42,11 @@ class ContentBasedRecommender(BaseModel):
             user_rankings = user_rankings.sort_values(by="score", ascending=False)
             content_based_rankings[user] = user_rankings.index.values
 
+        self.rankings = content_based_rankings
         return content_based_rankings
+
+    def evaluate_rank(self, N: int = 40):
+        return super().evaluate_rank(self.rankings, on_train=True, N=N)
 
     def clean_text(self, text):
         """
@@ -83,3 +88,11 @@ class ContentBasedRecommender(BaseModel):
                 else:
                     item_scores[neighbour_item] = nearest_items[neighbour_item]
         return item_scores
+
+    def get_similar_items(self, item_id: str, N: int = 10):
+        iid = self.item_to_index[item_id]
+        nearest_indices = self.get_knn(item_index=iid)
+        nearest_items = [[self.index_to_item[idx], score] for idx, score in nearest_indices.items()]
+        nearest_items = sorted(nearest_items, key=lambda x: x[1])
+        (nearest_items, _) = list(zip(*nearest_items)) 
+        return nearest_items

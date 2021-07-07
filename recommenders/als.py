@@ -3,6 +3,7 @@ import surprise
 import pandas as pd
 import numpy as np
 import scipy.sparse as sparse
+from evaluation import rank_score
 
 class ImplicitAlternatingLeastSquares(implicit.als.AlternatingLeastSquares):
     def __init__(
@@ -85,7 +86,18 @@ class ImplicitAlternatingLeastSquares(implicit.als.AlternatingLeastSquares):
                 recalculate_user=recalculate_user,
             )
             implicit_als_rankings[user] = [self.idx_to_iid[index] for (index, score) in rankings]
+
+        self.rankings = implicit_als_rankings
         return implicit_als_rankings
+
+    def evaluate_rank(self, N=40):
+        return rank_score(rankings=self.rankings, test_count=self.train_data, N=N)
+
+    def similar_items(self, item_id):
+        # TODO: Read documentation regarding item similarities
+
+        similarities = super().XtX
+        return []
 
     def get_baseline(self, row, bi: np.ndarray, bu: np.ndarray, mean):
         size = row["size"]
